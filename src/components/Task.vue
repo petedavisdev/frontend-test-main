@@ -1,54 +1,93 @@
 <template>
-    <li class="flex items-center justify-between gap-x-6 py-5 px-6">
-        <div class="min-w-0">
-            <div class="flex items-start gap-x-3">
-                <p class="text-sm/6 font-medium text-gray-900">
-                    {{ newTask.title }}
-                </p>
-            </div>
-        </div>
+	<li>
+		<div class="flex items-center justify-between gap-x-6 py-5 px-6">
+			<input
+				type="text"
+				v-model="taskTitle"
+				class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+				@input="editTaskTitle(task.id, taskTitle)"
+			/>
 
-        <div class="flex flex-none items-center gap-x-4">
-            <span data-cy="badge" class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
-                {{ newTask.complete ? 'complete' : 'incomplete' }}
-            </span>
+			<div class="flex flex-none items-center gap-x-4">
+				<span
+					data-cy="badge"
+					class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
+					:class="{
+						'bg-teal-50 text-teal-600 ring-teal-600/10':
+							props.task.complete,
+					}"
+				>
+					{{ props.task.complete ? 'complete' : 'incomplete' }}
+				</span>
 
-            <div class="relative flex-none">
-                <Menu>
-                    <template #trigger>
-                        <Button>
-                           <span class="sr-only">Open options</span>
-                            <svg class="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                                <path d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
-                            </svg>
-                        </Button>
-                    </template>
+				<div class="relative flex-none">
+					<Menu>
+						<template #trigger>
+							<Button>
+								<span class="sr-only">Open options</span>
+								<svg
+									class="size-5"
+									viewBox="0 0 20 20"
+									fill="currentColor"
+									aria-hidden="true"
+									data-slot="icon"
+								>
+									<path
+										d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"
+									/>
+								</svg>
+							</Button>
+						</template>
 
-                    <MenuItem @click="markComplete">
-                        Mark as complete
-                    </MenuItem>
+						<MenuItem
+							@click="
+								completeTask(
+									props.task.id,
+									!props.task.complete
+								)
+							"
+						>
+							Mark as
+							{{
+								!props.task.complete ? 'complete' : 'incomplete'
+							}}
+						</MenuItem>
 
-                </Menu>
-            </div>
-        </div>
-    </li>
+						<MenuItem @click="deleteTask(props.task.id)"
+							>Delete</MenuItem
+						>
+					</Menu>
+				</div>
+			</div>
+		</div>
+		<div class="py-3 px-6">
+			<Tasks
+				:tasks="subtasks"
+				heading="Subtasks"
+				addLabel="Add subtask"
+				:parentId="task.id"
+			/>
+		</div>
+	</li>
 </template>
 
 <script setup>
-    import { ref } from 'vue'
+import { ref, computed } from 'vue';
+import { useTasksStore } from '@/stores/useTasksStore';
+import Button from '@/components/Button.vue';
+import Menu from '@/components/Menu.vue';
+import MenuItem from '@/components/MenuItem.vue';
+import Tasks from '@/components/Tasks.vue';
 
-    import Button from '@/components/Button.vue'
-    import Menu from '@/components/Menu.vue'
-    import MenuItem from '@/components/MenuItem.vue'
+const emit = defineEmits(['delete']);
 
-    const props = defineProps({
-        task: Object,
-    })
+const props = defineProps({
+	task: Object,
+});
 
-    const newTask = ref(props.task)
+const { deleteTask, completeTask, editTaskTitle, getSubtasks } =
+	useTasksStore();
+const taskTitle = ref(props.task.title);
 
-    const markComplete = () => {
-        newTask.value.complete = true
-    }
-
+const subtasks = computed(() => getSubtasks(props.task.id));
 </script>

@@ -1,8 +1,9 @@
 <template>
 	<div class="p-8 space-y-8">
+		<h1 class="text-3xl/7 font-semibold text-gray-900">Home</h1>
 		<Header />
 
-		<Tasks :tasks="todos" />
+		<Tasks :tasks="topLevelTasks" />
 
 		<div>
 			<p class="text-sm mb-1 font-medium">Brownie points:</p>
@@ -18,8 +19,11 @@
 </template>
 
 <script setup>
+import { storeToRefs } from 'pinia';
 import Header from '@/components/Header.vue';
 import Tasks from '@/components/Tasks.vue';
+import { useTasksStore } from '@/stores/useTasksStore';
+const { topLevelTasks } = storeToRefs(useTasksStore());
 
 /**
  * Digistorm frontend test main tasks
@@ -33,38 +37,6 @@ import Tasks from '@/components/Tasks.vue';
  * - Allow users to add sub tasks
  * - Display completed tasks on a seperate page
  */
-const todos = [
-	{
-		id: 1,
-		title: 'Allow the user to add a new task',
-		complete: false,
-	},
-	{
-		id: 2,
-		title: 'Allow users to delete a task',
-		complete: false,
-	},
-	{
-		id: 3,
-		title: 'Show the badge in a different color for completed tasks',
-		complete: false,
-	},
-	{
-		id: 4,
-		title: 'Allow users to edit the title of their task',
-		complete: false,
-	},
-	{
-		id: 5,
-		title: 'Allow users to add sub tasks',
-		complete: false,
-	},
-	{
-		id: 6,
-		title: 'Display completed tasks on a seperate page',
-		complete: false,
-	},
-];
 </script>
 
 <style lang="scss" scoped></style>
